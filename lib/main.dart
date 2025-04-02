@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart';
+import 'screens/home_screen.dart';
+import 'screens/camera_screen.dart';
+import 'screens/settings_screen.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(const MyApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Shared Photo Album',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const HomeScreen(),
+      routes: {
+        '/camera': (context) => CameraScreen(),
+        '/settings': (context) => SettingsScreen(),
+      },
     );
   }
 }

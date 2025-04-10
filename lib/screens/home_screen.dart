@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_photo_album/widgets/photo_card.dart';
+import 'package:shared_photo_album/screens/photo_details_screen.dart'; // Make sure this import is here
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -47,7 +48,19 @@ class _HomeScreenState extends State<HomeScreen> {
           : ListView.builder(
               itemCount: imagePaths.length,
               itemBuilder: (context, index) {
-                return PhotoCard(imagePath: imagePaths[index]);
+                final path = imagePaths[index];
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            PhotoDetailsScreen(imagePath: path),
+                      ),
+                    );
+                  },
+                  child: PhotoCard(imagePath: path),
+                );
               },
             ),
       floatingActionButton: FloatingActionButton(

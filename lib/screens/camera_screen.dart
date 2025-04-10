@@ -1,67 +1,42 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:camera/camera.dart';
-import '../services/camera_service.dart';
-import 'photo_details_screen.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' show basename;
 
 class CameraScreen extends StatefulWidget {
+  const CameraScreen({Key? key}) : super(key: key);
+
   @override
-  _CameraScreenState createState() => _CameraScreenState();
+  State<CameraScreen> createState() => _CameraScreenState();
 }
 
 class _CameraScreenState extends State<CameraScreen> {
-  final CameraService _cameraService = CameraService();
+  final ImagePicker _picker = ImagePicker();
 
-  @override
-  void initState() {
-    super.initState();
-    _initializeCamera();
-  }
+  Future<void> _takePicture() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
 
-  Future<void> _initializeCamera() async {
-    await _cameraService.initializeCamera();
-    if (mounted) {
-      setState(() {});
+    if (image != null) {
+      final directory = await getApplicationDocumentsDirectory();
+      final String imagePath = '${directory.path}/${basename(image.path)}';
+      await File(image.path).copy(imagePath);
+
+      if (!mounted) return;
+      Navigator.pop(context, imagePath);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_cameraService.cameraController == null ||
-        !_cameraService.cameraController!.value.isInitialized) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
     return Scaffold(
-      appBar: AppBar(title: const Text("Camera")),
-      body: Stack(
-        children: [
-          CameraPreview(_cameraService.cameraController!),
-          Positioned(
-            bottom: 20,
-            left: MediaQuery.of(context).size.width / 2 - 35,
-            child: FloatingActionButton(
-              onPressed: () async {
-                String? imagePath = await _cameraService.takePicture();
-                if (imagePath != null) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => PhotoDetailsScreen(imagePath: imagePath),
-                    ),
-                  );
-                }
-              },
-              child: const Icon(Icons.camera_alt),
-            ),
-          ),
-        ],
+      appBar: AppBar(title: const Text('Camera')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: _takePicture,
+          child: const Text('Take a Picture'),
+        ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _cameraService.dispose();
-    super.dispose();
   }
 }

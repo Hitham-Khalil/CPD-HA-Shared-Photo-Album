@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_photo_album/widgets/photo_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -9,38 +10,49 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String? imagePath;
+  List<String> imagePaths = [];
 
-  // Function to navigate to CameraScreen and get the image path
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedImages();
+  }
+
+  Future<void> _loadSavedImages() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedPaths = prefs.getStringList('saved_images') ?? [];
+    setState(() {
+      imagePaths = savedPaths;
+    });
+  }
+
   void _navigateToCameraScreen() async {
     final result = await Navigator.pushNamed(context, '/camera');
     if (result != null && result is String) {
       setState(() {
-        imagePath = result;  // Update image path when returning from CameraScreen
+        imagePaths.add(result);
       });
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('saved_images', imagePaths);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home Screen'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: _navigateToCameraScreen,
-              child: const Text('Go to Camera'),
+      appBar: AppBar(title: const Text('Home Screen')),
+      body: imagePaths.isEmpty
+          ? const Center(child: Text('No images yet.'))
+          : ListView.builder(
+              itemCount: imagePaths.length,
+              itemBuilder: (context, index) {
+                return PhotoCard(imagePath: imagePaths[index]);
+              },
             ),
-            const SizedBox(height: 20),
-            imagePath != null
-                ? PhotoCard(imagePath: imagePath!)
-                : const Text('No image taken'),
-          ],
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _navigateToCameraScreen,
+        child: const Icon(Icons.camera_alt),
       ),
     );
   }

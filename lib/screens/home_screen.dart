@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_photo_album/widgets/photo_card.dart';
-import 'package:shared_photo_album/screens/photo_details_screen.dart'; // Make sure this import is here
+import 'package:shared_photo_album/screens/photo_details_screen.dart';
+import 'dart:io'; // for deleting files
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -39,10 +40,36 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _deleteImage(int index) async {
+    final path = imagePaths[index];
+
+    setState(() {
+      imagePaths.removeAt(index);
+    });
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('saved_images', imagePaths);
+
+    final file = File(path);
+    if (await file.exists()) {
+      await file.delete();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Home Screen')),
+      appBar: AppBar(
+        title: const Text('Home Screen'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.pushNamed(context, '/settings');
+            },
+          ),
+        ],
+      ),
       body: imagePaths.isEmpty
           ? const Center(child: Text('No images yet.'))
           : ListView.builder(
@@ -59,7 +86,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     );
                   },
-                  child: PhotoCard(imagePath: path),
+                  child: PhotoCard(
+                    imagePath: path,
+                    onDelete: () => _deleteImage(index),
+                  ),
                 );
               },
             ),

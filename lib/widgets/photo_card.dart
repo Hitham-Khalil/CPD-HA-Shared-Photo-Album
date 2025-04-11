@@ -3,16 +3,18 @@ import 'package:flutter/material.dart';
 
 class PhotoCard extends StatelessWidget {
   final String imagePath;
+  final VoidCallback? onDelete;
 
-  const PhotoCard({super.key, required this.imagePath});
+  const PhotoCard({
+    super.key,
+    required this.imagePath,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
-    // Check if the imagePath is valid
     if (imagePath.isEmpty || !File(imagePath).existsSync()) {
-      return const Center(
-        child: Text("No image available"),
-      );
+      return const Center(child: Text("No image available"));
     }
 
     return Card(
@@ -26,12 +28,21 @@ class PhotoCard extends StatelessWidget {
             width: double.infinity,
             height: 200,
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              "Captured Image",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  "Captured Image",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete),
+                onPressed: onDelete,
+              ),
+            ],
           ),
         ],
       ),

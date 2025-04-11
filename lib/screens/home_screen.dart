@@ -3,9 +3,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_photo_album/widgets/photo_card.dart';
 import 'package:shared_photo_album/screens/photo_details_screen.dart';
 import 'dart:io'; // for deleting files
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';  // Import the notification plugin
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;  // Pass notification plugin
+
+  const HomeScreen({Key? key, required this.flutterLocalNotificationsPlugin}) : super(key: key);
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -37,6 +40,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setStringList('saved_images', imagePaths);
+
+      // Show notification when a photo is taken
+      _showNotification('New photo taken and added to your album');
     }
   }
 
@@ -54,6 +60,29 @@ class _HomeScreenState extends State<HomeScreen> {
     if (await file.exists()) {
       await file.delete();
     }
+
+    // Show notification when a photo is deleted
+    _showNotification('Photo deleted from your album');
+  }
+
+  Future<void> _showNotification(String message) async {
+    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+      'photo_channel', // Channel ID
+      'Photo Notifications', // Channel Name
+      channelDescription: 'Notifications for photo actions',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+
+    const NotificationDetails notificationDetails =
+        NotificationDetails(android: androidDetails);
+
+    await widget.flutterLocalNotificationsPlugin.show(
+      0,
+      'Photo Update',
+      message,
+      notificationDetails,
+    );
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'screens/home_screen.dart';
@@ -8,7 +9,8 @@ import 'screens/settings_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize local notifications plugin
+  await Firebase.initializeApp();
+
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   const AndroidInitializationSettings initializationSettingsAndroid =

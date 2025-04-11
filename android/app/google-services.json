@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "253191127371",
+    "project_id": "shearedphotoalbum",
+    "storage_bucket": "shearedphotoalbum.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:253191127371:android:b729b954aad74c065968ce",
+        "android_client_info": {
+          "package_name": "com.example.shared_photo_album"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDh-ZvhYaAfrI6IbtEKbqfpo3nCGhGEkqc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
